@@ -108,7 +108,6 @@ object TmdbFirstPass extends App {
       for (movie <- movieList) {
         val m1 = new Movie(movie,db)
         val actors = m1.getActors()
-        println("costars: " + actors)
         costarList ++= actors
       }
       costarList = costarList.distinct
@@ -165,7 +164,7 @@ object TmdbFirstPass extends App {
       actorsInMovies += (8, 50, 10),
     )
     val setupFuture = db.run(setup)
-    val debugDump = true
+    val debugDump = false
     if (debugDump) {
       println("======= Debug dump of database =======")
       val resultFuture = setupFuture.flatMap { _ =>
@@ -187,27 +186,33 @@ object TmdbFirstPass extends App {
       }
       Await.result(resultFuture, Duration.Inf)
       println("======= Debug dump of database =======")
+    } else {
+      Await.result(setupFuture, Duration.Inf)
     }
 
-
+    println("\n### Movie test:")
     val m1 = new Movie("Ghostbusters", db)
     println(m1.getMyInfo())
+    // leaving output in List format to show actual return value
     println("actors in " + m1.movieName + ": " + m1.getActors())
 
 
+    println("\n###  Actor test:")
     val a1 = new Actor("Cary Elwes", db)
     println(a1.getMyInfo)
+    // leaving output in List format to show actual return value
     println(a1.actorName + " has been in : " + a1.getMovies())
     println(a1.actorName + " has costared with : " + a1.getCostars())
 
 
-    println("======  test unknown movie ======")
+    // todo - move these into test directory as test cases
+    println("\n### test unknown movie")
     val m2 = new Movie("Aliens", db)
     println(m2.getMyInfo())
     println("actors in " + m2.movieName + ": " + m2.getActors())
 
 
-    println("======  test unknown actor ======")
+    println("\n### test unknown actor")
     val a2 = new Actor("Fred Jones", db)
     println(a2.getMyInfo)
     println(a2.actorName + " has been in : " + a2.getMovies())
